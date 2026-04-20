@@ -1089,8 +1089,10 @@ function copyNotice(id){
   if(!n||!n.memo)return;
   const tmp=document.createElement('div');
   tmp.innerHTML=n.memo;
-  const text=(n.title?n.title+'\n':'')+tmp.textContent;
-  // Fallback copy method
+  // Preserve line breaks
+  tmp.querySelectorAll('br').forEach(br=>br.replaceWith('\n'));
+  tmp.querySelectorAll('div,p').forEach(el=>el.prepend('\n'));
+  const text=tmp.textContent.replace(/\n{3,}/g,'\n\n').trim();
   const ta=document.createElement('textarea');
   ta.value=text;
   ta.style.position='fixed';ta.style.opacity='0';
