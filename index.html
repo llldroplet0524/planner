@@ -3892,6 +3892,7 @@ function renderTaskDetailModal(taskId){
       </div>
       <div style="display:flex;gap:0.3em;flex-shrink:0;margin-left:0.5em;">
         <button class="btn" onclick="copyTask(${taskId});closeModal('taskdetail')" style="background:var(--teal-bg);color:var(--teal);border:0.0625em solid var(--teal);font-size:0.78em;padding:0.3em 0.7em;">⊕ 복사</button>
+        <button class="btn" onclick="copySubs(${taskId})" style="background:var(--bg3);color:var(--text2);border:0.0625em solid var(--border);font-size:0.78em;padding:0.3em 0.7em;">📝 메모동기화</button>
         <button class="btn" onclick="closeModal('taskdetail');editTask(${taskId})" style="background:var(--accent-bg);color:var(--accent2);border:0.0625em solid var(--accent);font-size:0.78em;padding:0.3em 0.7em;">✏ 수정</button>
         <button class="btn" onclick="deleteTaskFromModal(${taskId})" style="background:var(--red-bg);color:var(--red);border:0.0625em solid var(--red-bg);font-size:0.78em;padding:0.3em 0.7em;">✕ 삭제</button>
         <button class="btn bcnl" onclick="closeModal('taskdetail')" style="font-size:0.78em;padding:0.3em 0.7em;">닫기</button>
