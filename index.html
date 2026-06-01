@@ -1884,7 +1884,7 @@ async function doCopyTask(t,taskId,subsWithDates,nextY,nextM){
   if(error){showToast('복사 오류: '+error.message,true);return;}
   const newId=data[0].id;
   if(subsWithDates.length){
-    const subRows=subsWithDates.map(s=>({task_id:newId,name:s.name,done:false,due_date:s.due_date||null}));
+    const subRows=subsWithDates.map(s=>({task_id:newId,name:s.name,done:false,due_date:s.due_date||null,memo:s.memo||null}));
     await sb.from('subtasks').insert(subRows);
   }
   showToast(`${nextY}년 ${nextM}월에 복사 완료!`,false);
@@ -4033,14 +4033,15 @@ async function saveEditSub(subId, from, taskId){
   const{error}=await sb.from('subtasks').update(updateData).eq('id',N(subId));
   if(error)return showToast('수정 오류: '+error.message,true);
 
-  // 메모 전체 월 동기화 — DB 직접 조회 방식
+  // 메모 전체 월 동기화 — 캐시 의존 없이 DB 직접 조회
   if(memoSync && srcSub){
-    const allTasks=window._allTasksCache||tasks;
-    const srcTask=allTasks.find(t=>N(t.id)===N(srcSub.task_id));
+    const {data:freshTasks}=await sb.from('tasks').select('id,name,task_key');
+    const allTasksForSync=freshTasks||window._allTasksCache||tasks;
+    const srcTask=allTasksForSync.find(t=>N(t.id)===N(srcSub.task_id));
     if(!srcTask){ showToast('상위 태스크를 찾을 수 없어 동기화를 건너뜀.',true); }
     else {
       const srcKey=srcTask.task_key||srcTask.name;
-      const relatedTaskIds=allTasks
+      const relatedTaskIds=allTasksForSync
         .filter(t=>(t.task_key||t.name)===srcKey)
         .map(t=>N(t.id));
       // task_id 목록으로 하위태스크 전체 조회 후 JS에서 이름 필터링 (특수문자 쿼리 오류 방지)
