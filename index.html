@@ -854,7 +854,8 @@ async function loadAll(){
     if(tk.error)throw tk.error;
     transfers=tr.data||[];tasks=tk.data||[];subtasks=st.data||[];
     journals=jo.data||[];trHistory=th.data||[];images=im.data||[];memos=mm.data||[];
-    window._allTasksCache=allTk.data||[];taskTemplates=tt.data||[];
+    if(!allTk.error) window._allTasksCache=allTk.data||[];
+    taskTemplates=tt.data||[];
     setSS('ok','동기화 완료');
     renderAll();
   }catch(e){setSS('error','연결 오류');console.error(e);}
@@ -3758,6 +3759,7 @@ async function copyTmplToMonth(taskKey,repTaskId){
   const nextY=parseInt(sel[0]),nextM=parseInt(sel[1]);
   const t=(window._allTasksCache||tasks).find(x=>N(x.id)===N(repTaskId));if(!t)return;
   const tmplSubs=taskTemplates.filter(ts=>ts.task_key===taskKey).sort((a,b)=>(a.sort_order||a.id)-(b.sort_order||b.id));
+  if(!tmplSubs.length) return showToast('템플릿을 먼저 저장해주세요.',true);
   const subsWithDates=tmplSubs.map(ts=>{
     let due_date=null;
     if(ts.default_day){
@@ -3770,7 +3772,6 @@ async function copyTmplToMonth(taskKey,repTaskId){
     return {name:ts.sub_name,done:false,due_date};
   });
   await doCopyTask(t,repTaskId,subsWithDates,nextY,nextM);
-  showToast(`${nextY}년 ${nextM}월에 복사됐어요.`,false);await loadAll();
 }
 
 function showPage(page){
@@ -4036,8 +4037,9 @@ async function saveEditSub(subId, from, taskId){
   if(memoSync && srcSub){
     const allTasks=window._allTasksCache||tasks;
     const srcTask=allTasks.find(t=>N(t.id)===N(srcSub.task_id));
-    const srcKey=srcTask?srcTask.task_key||srcTask.name:null;
-    if(srcKey){
+    if(!srcTask){ showToast('상위 태스크를 찾을 수 없어 동기화를 건너뜀.',true); }
+    else {
+      const srcKey=srcTask.task_key||srcTask.name;
       const relatedTaskIds=allTasks
         .filter(t=>(t.task_key||t.name)===srcKey)
         .map(t=>N(t.id));
@@ -4053,6 +4055,8 @@ async function saveEditSub(subId, from, taskId){
           const ids=targets.map(s=>N(s.id));
           await sb.from('subtasks').update({memo}).in('id', ids);
           showToast(`메모를 ${ids.length}개 월에 동기화했어요.`, false);
+        } else {
+          showToast('다른 월에 같은 이름의 하위 태스크가 없어요.', true);
         }
       }
     }
