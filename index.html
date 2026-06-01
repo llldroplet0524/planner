@@ -1694,7 +1694,7 @@ async function addSub(taskId){
 async function autoCompleteTask(taskId){
   if(!taskId) return;
   const subs=subtasks.filter(s=>N(s.task_id)===N(taskId));
-  const t=tasks.find(x=>N(x.id)===N(taskId));
+  const t=(window._allTasksCache||tasks).find(x=>N(x.id)===N(taskId));
   console.log('[autoComplete] taskId=',taskId,'task=',t?.name,'status=',t?.status,'subs=',subs.length,'doneCnt=',subs.filter(s=>s.done).length);
   if(!subs.length) return;
   if(!t) return;
