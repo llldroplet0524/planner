@@ -1525,7 +1525,8 @@ function renderDetail(d, filter='all'){
     });
   const tk=tasks.filter(t=>Number(t.day)===Number(d));
   const dateStr=`${curY}-${String(curM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  const st=subtasks.filter(s=>s.due_date===dateStr);
+  const curTaskIds=new Set(tasks.map(t=>N(t.id)));
+  const st=subtasks.filter(s=>s.due_date===dateStr&&curTaskIds.has(N(s.task_id)));
   const el=document.getElementById('detail');
 
   const showTr = filter==='all'||filter==='tr';
