@@ -1525,8 +1525,7 @@ function renderDetail(d, filter='all'){
     });
   const tk=tasks.filter(t=>Number(t.day)===Number(d));
   const dateStr=`${curY}-${String(curM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  const curTaskIds=new Set(tasks.map(t=>N(t.id)));
-  const st=subtasks.filter(s=>s.due_date===dateStr&&curTaskIds.has(N(s.task_id)));
+  const st=subtasks.filter(s=>s.due_date===dateStr);
   const el=document.getElementById('detail');
 
   const showTr = filter==='all'||filter==='tr';
@@ -1590,6 +1589,7 @@ function renderDetail(d, filter='all'){
           <span style="font-size:0.78em;color:var(--text2);font-weight:500;cursor:pointer;padding:0.125em 0.5em;background:var(--bg3);border:0.0625em solid var(--border);border-left:0.1875em solid ${borderColor};border-radius:0.25em;"
             onclick="showTaskPopup(event,${pt.id})">📋 ${pt.name}</span>
           <span class="badge ${tc}" style="font-size:0.72em;">${pt.task_type||'월간'}</span>
+          ${(pt.year&&pt.month&&(pt.year!==curY||pt.month!==curM+1))?`<span style="font-size:0.72em;padding:0.1em 0.45em;border-radius:0.25em;background:var(--amber-bg,#fffbeb);color:var(--amber,#d97706);border:0.0625em solid var(--amber,#d97706);white-space:nowrap;">⏰ ${pt.month}월 업무</span>`:''}
           ${pt.memo?`<span style='cursor:pointer;font-size:0.9em;' onmouseenter="showSubMemoPopup(event,'${(pt.memo||'').replace(/'/g,"\\'").replace(/\n/g,'\\n')}')" onmouseleave="hideSubMemoPopup()">📝</span>`:''}
           ${ptLinkedMemos.length?`<span style='width:0.6em;height:0.6em;border-radius:50%;background:#f472b6;display:inline-block;cursor:pointer;' onmouseenter="showSubMemoPopup(event,'${ptLinkedPreview.replace(/'/g,"\\'").replace(/\n/g,'\\n')}')" onmouseleave="hideSubMemoPopup()"></span>`:''}
         </div>`;
